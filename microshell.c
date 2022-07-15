@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   microshell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: obouykou <obouykou@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: bclarind <bclarind@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/15 08:43:26 by obouykou          #+#    #+#             */
-/*   Updated: 2021/04/21 14:52:16 by obouykou         ###   ########.fr       */
+/*   Updated: 2022/07/14 08:56:43 by bclarind         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,8 @@ void	push_front_cmd(t_cmds **cmds_list, char *arg)
 
 void	parse_args(t_cmds **cmds, int ac, char **av)
 {
-	int i;
-	char is_s_colon;
+	int		i;
+	char	is_s_colon;
 
 	i = 0;
 	while (++i < ac)

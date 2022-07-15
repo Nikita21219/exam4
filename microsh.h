@@ -8,17 +8,15 @@
 # include <string.h>
 
 # define ERROR 1
-
-typedef struct s_arg
-{
-	char			*arg;
-	struct s_arg	*next;
-}	t_arg;
+# define PIPE 1
+# define SEMICOLON 2
 
 typedef struct s_data
 {
 	char			*comm;
-	t_arg			*arg;
+	char			**args;
+	int				oper;
+	int				arg_len;
 	struct s_data	*next;
 }	t_data;
 
