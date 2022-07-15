@@ -8,6 +8,8 @@
 # include <string.h>
 
 # define ERROR 1
+# define ERROR_EXECVE 2
+
 # define PIPE 1
 # define SEMICOLON 2
 
@@ -17,7 +19,9 @@ typedef struct s_data
 	char			**args;
 	int				oper;
 	int				arg_len;
+	int				fd[2];
 	struct s_data	*next;
+	struct s_data	*prev;
 }	t_data;
 
 
