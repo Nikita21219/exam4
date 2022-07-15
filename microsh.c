@@ -20,12 +20,12 @@ void	put_str(char *buf)
 	write(2, buf, ft_strlen(buf));
 }
 
-void	ft_exit(int code)
+void	ft_exit(int code, char *str)
 {
 	if (code == ERROR)
 		put_str("error: fatal\n");
 	if (code == ERROR_EXECVE)
-		put_str("error: cannot execute executable_that_failed\n");
+		put_str("error: cannot execute %s\n", str);
 	exit(1);
 }
 
@@ -35,13 +35,13 @@ t_data	*init_new_comm(char *comm)
 
 	new = malloc(sizeof(t_data));
 	if (new == NULL)
-		ft_exit(ERROR);
+		ft_exit(ERROR, NULL);
 	new->comm = comm;
 	new->arg_len = 0;
 	new->oper = 0;
 	new->args = malloc(sizeof(char *) * 2);
 	if (new->args == NULL)
-		ft_exit(ERROR);
+		ft_exit(ERROR, NULL);
 	new->args[0] = "./microshell";
 	new->args[1] = NULL;
 	new->next = NULL;
@@ -74,7 +74,7 @@ void	add_new_arg(t_data *data, char *arg)
 
 	tmp = malloc(data->arg_len + 3 * sizeof(char *) * 1000);
 	if (tmp == NULL)
-		ft_exit(ERROR);
+		ft_exit(ERROR, NULL);
 	i = 0;
 	while (data->next)
 		data = data->next;
@@ -137,7 +137,7 @@ void	print_data(t_data *data)
 void	do_pipe(t_data *data)
 {
 	if (pipe(data->fd) == -1)
-		ft_exit(ERROR);
+		ft_exit(ERROR, NULL);
 }
 
 void	duplicate_fds(t_data *data)
@@ -146,12 +146,12 @@ void	duplicate_fds(t_data *data)
 	if (data && data->oper == PIPE)
 	{
 		if (dup2(data->fd[1], STDOUT_FILENO) == -1)
-			ft_exit(ERROR);
+			ft_exit(ERROR, NULL);
 	}
 	else if (data && data->prev && data->prev->oper == PIPE)
 	{
 		if (dup2(data->prev->fd[0], STDIN_FILENO) == -1)
-			ft_exit(ERROR);
+			ft_exit(ERROR, NULL);
 	}
 }
 
@@ -165,7 +165,7 @@ void	main_logic(t_data *data, char **env)
 			do_pipe(data);
 		pid = fork();
 		if (pid == -1)
-			ft_exit(ERROR);
+			ft_exit(ERROR, NULL);
 		else if (pid == 0)
 		{
 			duplicate_fds(data);
