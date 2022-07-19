@@ -25,7 +25,11 @@ void	ft_exit(int code, char *str)
 	if (code == ERROR)
 		put_str("error: fatal\n");
 	if (code == ERROR_EXECVE)
-		put_str("error: cannot execute %s\n", str);
+	{
+		put_str("error: cannot execute ");
+		put_str(str);
+		put_str("\n");
+	}
 	exit(1);
 }
 
@@ -142,7 +146,6 @@ void	do_pipe(t_data *data)
 
 void	duplicate_fds(t_data *data)
 {
-	(void) data;
 	if (data && data->oper == PIPE)
 	{
 		if (dup2(data->fd[1], STDOUT_FILENO) == -1)
@@ -155,25 +158,60 @@ void	duplicate_fds(t_data *data)
 	}
 }
 
+int	get_count_commands(t_data *data)
+{
+	int	count;
+
+	count = 0;
+	while (data->next)
+	{
+		count++;
+		data = data->next;
+	}
+	return (count);
+}
+
 void	main_logic(t_data *data, char **env)
 {
-	int	pid;
+	int	i;
+	int	*pids;
 
+	i = 0;
+	pids = malloc(sizeof(int) * get_count_commands(data) + sizeof(int));
+	if (pids == NULL)
+		ft_exit(ERROR, NULL);
 	while (data)
 	{
 		if (data->oper == PIPE)
 			do_pipe(data);
-		pid = fork();
-		if (pid == -1)
+		pids[i] = fork();
+		if (pids[i] == -1)
 			ft_exit(ERROR, NULL);
-		else if (pid == 0)
+		else if (pids[i] == 0)
 		{
 			duplicate_fds(data);
 			if (execve(data->comm, data->args, env) == -1)
-				ft_exit(ERROR_EXECVE);
+				ft_exit(ERROR_EXECVE, data->comm);
+		}
+		else
+		{
+			if (waitpid(pids[i], NULL, WNOHANG) == -1)
+				ft_exit(ERROR, NULL);
+			if (data->oper == PIPE)
+				if (close(data->fd[1]) == -1)
+					ft_exit(ERROR, NULL);
+			if (data->prev && data->prev->oper == PIPE)
+				if (close(data->prev->fd[0]) == -1)
+					ft_exit(ERROR, NULL);
 		}
 		data = data->next;
+		i++;
 	}
+	pids[i] = 0;
+	// i = -1;
+	// while (pids[++i])
+	// 	if (waitpid(pids[i], NULL, WNOHANG) == -1)
+	// 		ft_exit(ERROR, NULL);
 }
 
 int	main(int argc, char **argv, char **env)
